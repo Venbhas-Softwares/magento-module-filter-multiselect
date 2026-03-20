@@ -117,9 +117,23 @@ class Attribute extends CatalogSearchAttribute
     private function convertAttributeValue(ProductAttributeInterface $attribute, mixed $value): mixed
     {
         if ($attribute->getBackendType() === 'int') {
-            return is_array($value)
-                ? array_map('intval', $value)
-                : (int)$value;
+            if (is_array($value)) {
+                // Use string option IDs for multi-select. Elasticsearch terms queries accept these for
+                // integer-mapped fields, and this avoids Framework Search Binder applying trim() to raw
+                // integers when binding placeholders (which would error on PHP 8+).
+                return array_values(
+                    array_map(
+                        static fn ($v) => (string)(int)$v,
+                        $value
+                    )
+                );
+            }
+
+            return (int)$value;
+        }
+
+        if (is_array($value)) {
+            return array_values(array_map(static fn ($v) => is_scalar($v) ? (string)$v : $v, $value));
         }
 
         return $value;

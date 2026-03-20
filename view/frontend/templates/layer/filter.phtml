@@ -83,20 +83,6 @@ $useCheckboxes = !$isPriceFilter && $isMultiSelectEnabled;
         </li>
     <?php endforeach; ?>
 </ol>
-
-<?php if ($useCheckboxes): ?>
-<script>
-(function() {
-    // Delegate at document level so checkboxes work when inside Alpine x-if (Hyva:
-    // filter content is only in the DOM when the section is expanded).
-    if (window.__venbhasFilterMultiselectBound) return;
-    window.__venbhasFilterMultiselectBound = true;
-    document.addEventListener('change', function(e) {
-        if (e.target.matches('input.filter-checkbox')) {
-            var url = e.target.dataset.url;
-            if (url) window.location.href = url;
-        }
-    });
-})();
-</script>
-<?php endif; ?>
+<?php
+// JS: layer/filter-js.phtml → static venbhas-filter-multiselect.js (before.body.end).
+?>

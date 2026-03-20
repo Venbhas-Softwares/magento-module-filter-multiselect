@@ -15,7 +15,15 @@
             <argument name="url" xsi:type="object">Magento\Framework\UrlInterface</argument>
             <argument name="htmlPagerBlock" xsi:type="object">Magento\Theme\Block\Html\Pager</argument>
             <argument name="request" xsi:type="object">Magento\Framework\App\Request\Http</argument>
+            <argument name="config" xsi:type="object">Venbhas\FilterMultiselect\Model\Config</argument>
         </arguments>
+    </type>
+
+    <!-- Fix remove URL for active filter chips (trash icon) when State uses any Item implementation -->
+    <type name="Magento\Catalog\Model\Layer\Filter\Item">
+        <plugin name="venbhas_filtermultiselect_item_remove_url"
+                type="Venbhas\FilterMultiselect\Plugin\Layer\Filter\ItemPlugin"
+                sortOrder="10"/>
     </type>
 
     <!-- Inject dependencies into Attribute class for multi-select filter logic -->
