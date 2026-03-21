@@ -26,7 +26,7 @@ Price filters are intentionally left as single-select links, preserving the stan
 - Toggle on/off via **Magento Admin** without touching code
 - Configurable per **Default / Website / Store** scope
 - Compatible with **OpenSearch** and **Elasticsearch** backends
-- No third-party JavaScript dependencies — uses Magento's native `x-magento-init` initializer
+- Storefront script is a small static file (`venbhas-filter-multiselect.js`) loaded from layout (Hyvä + Luma)
 
 ---
 
@@ -123,10 +123,13 @@ Venbhas/FilterMultiselect/
 │   └── adminhtml/system.xml               # Admin configuration UI
 ├── view/frontend/
 │   ├── layout/
+│   │   ├── default.xml                     # Loads filter-js.phtml globally
 │   │   ├── catalog_category_view_type_layered.xml
 │   │   └── catalogsearch_result_index.xml
-│   ├── templates/layer/filter.phtml        # Filter rendering template
-│   └── web/js/filter-multiselect.js       # Checkbox → URL navigation handler
+│   ├── templates/layer/
+│   │   ├── filter.phtml                    # Filter rendering template
+│   │   └── filter-js.phtml                 # References storefront JS asset
+│   └── web/js/venbhas-filter-multiselect.js  # Checkbox → URL navigation
 ├── composer.json
 ├── registration.php
 └── LICENSE

@@ -51,6 +51,7 @@ class Item extends CoreItem
      * Get URL to add this value to the active multi-select array.
      *
      * Reads current selected values and appends this value to the array.
+     * Handles both scalar and array item values (state items may store arrays).
      *
      * @return string
      */
@@ -62,16 +63,23 @@ class Item extends CoreItem
 
         $filterCode = $this->getFilter()->getRequestVar();
         $currentValues = $this->_getCurrentFilterValues($filterCode);
+        $value = $this->getValue();
+        $valuesToAdd = is_array($value) ? $value : [$value];
 
-        if (!in_array($this->getValue(), $currentValues)) {
-            $currentValues[] = $this->getValue();
+        foreach ($valuesToAdd as $v) {
+            if (!in_array($v, $currentValues)) {
+                $currentValues[] = $v;
+            }
         }
 
         return $this->_buildUrl($filterCode, $currentValues);
     }
 
     /**
-     * Get URL to remove this value from the active multi-select array.
+     * Get URL to remove this filter from the active state (trash icon).
+     *
+     * When multi-select is enabled, each state chip represents this filter's current selection;
+     * removing the chip removes the whole filter from the URL (no dependency on value/label match).
      *
      * @return string
      */
@@ -82,26 +90,49 @@ class Item extends CoreItem
         }
 
         $filterCode = $this->getFilter()->getRequestVar();
-        $currentValues = $this->_getCurrentFilterValues($filterCode);
 
-        $key = array_search($this->getValue(), $currentValues);
-        if ($key !== false) {
-            unset($currentValues[$key]);
-            $currentValues = array_values($currentValues);
+        return $this->_buildUrl($filterCode, []);
+    }
+
+    /**
+     * Luma uses getClearLinkUrl() for the remove link when the filter defines clear link text.
+     * Use the same multi-select-safe URL as getRemoveUrl().
+     *
+     * @return false|string
+     */
+    public function getClearLinkUrl()
+    {
+        if (!$this->config->isEnabled()) {
+            return parent::getClearLinkUrl();
         }
 
-        return $this->_buildUrl($filterCode, $currentValues);
+        $parentUrl = parent::getClearLinkUrl();
+        if ($parentUrl === false) {
+            return false;
+        }
+
+        return $this->getRemoveUrl();
     }
 
     /**
      * Check if this filter value is currently active (multi-select).
+     * Handles both scalar and array item values (state items may store arrays).
      *
      * @return bool
      */
     public function isSelected()
     {
         $filterCode = $this->getFilter()->getRequestVar();
-        return in_array($this->getValue(), $this->_getCurrentFilterValues($filterCode));
+        $currentValues = $this->_getCurrentFilterValues($filterCode);
+        $value = $this->getValue();
+        $valuesToCheck = is_array($value) ? $value : [$value];
+
+        foreach ($valuesToCheck as $v) {
+            if (in_array($v, $currentValues)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -196,8 +227,12 @@ class Item extends CoreItem
     {
         $params = $this->_getBaseParams($filterCode);
 
+        // With _current => true, Magento merges the full request query first; only keys in _query
+        // are updated. Omitting the filter leaves the old param — must pass null to clear it.
         if (!empty($values)) {
             $params[$filterCode] = $values;
+        } else {
+            $params[$filterCode] = null;
         }
 
         $params['p'] = 1;
