@@ -9,15 +9,18 @@ define(['jquery'], function($) {
     'use strict';
 
     return function(config, element) {
+        if (window.__venbhasFilterMultiselectRequireJsBound) {
+            return;
+        }
+        window.__venbhasFilterMultiselectRequireJsBound = true;
+
         /**
-         * Handle filter checkbox change events
-         * Only observes checkboxes with class 'filter-checkbox'
+         * Delegated handler (element is usually body on Luma).
          */
         $(element).on('change', 'input.filter-checkbox', function() {
             var $checkbox = $(this);
             var url = $checkbox.data('url');
 
-            // Navigate to the URL if it exists
             if (url) {
                 window.location.href = url;
             }

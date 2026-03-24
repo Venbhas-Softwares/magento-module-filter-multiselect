@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <fieldset name="front_fieldset">
+        <field name="venbhas_layered_multiselect"
+               component="Magento_Catalog/js/components/disable-on-option/yesno"
+               sortOrder="65"
+               formElement="checkbox">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="valuesForEnable" xsi:type="array">
+                        <item name="boolean" xsi:type="string">boolean</item>
+                        <item name="select" xsi:type="string">select</item>
+                        <item name="multiselect" xsi:type="string">multiselect</item>
+                        <item name="price" xsi:type="string">price</item>
+                    </item>
+                    <item name="source" xsi:type="string">product_attribute</item>
+                    <item name="default" xsi:type="number">0</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>boolean</dataType>
+                <label translate="true">Allow Multi-Select in Layered Navigation</label>
+                <notice translate="true">Requires Venbhas extension enabled, global "Allow Multi-Select in Layered Navigation" Yes, and this attribute set to Yes. Otherwise the storefront uses single-select. Use with filterable layered navigation input types.</notice>
+                <dataScope>venbhas_layered_multiselect</dataScope>
+                <imports>
+                    <link name="visible">${ $.parentName}:visible</link>
+                </imports>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+    </fieldset>
+</form>

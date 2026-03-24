@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Venbhas\FilterMultiselect\ViewModel;
 
+use Magento\Catalog\Model\Layer\Filter\FilterInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\View\Element\Block\ArgumentInterface;
 use Magento\Store\Model\ScopeInterface;
@@ -28,13 +29,53 @@ class FilterConfig implements ArgumentInterface
     ) {}
 
     /**
-     * Whether multi-select checkbox mode is enabled for attribute filters.
-     *
-     * @return bool
+     * Whether the extension is enabled at store scope.
+     */
+    public function isExtensionEnabled(): bool
+    {
+        return $this->config->isExtensionEnabled();
+    }
+
+    /**
+     * @deprecated Use isExtensionEnabled()
      */
     public function isEnabled(): bool
     {
-        return $this->config->isEnabled();
+        return $this->config->isExtensionEnabled();
+    }
+
+    /**
+     * Global "allow multi-select in layered navigation" (still requires per-attribute opt-in).
+     */
+    public function isMultiselectGloballyEnabled(): bool
+    {
+        return $this->config->isMultiselectGloballyEnabled();
+    }
+
+    /**
+     * Luma/Blank: load RequireJS checkbox navigation only when extension and global multi-select may apply.
+     */
+    public function shouldUseRequireJsForCheckboxNav(): bool
+    {
+        return $this->config->isExtensionEnabled()
+            && $this->config->isMultiselectGloballyEnabled();
+    }
+
+    /**
+     * Multi-select checkboxes for this layered navigation filter (attribute must opt in).
+     */
+    public function isMultiselectForFilter(?FilterInterface $filter): bool
+    {
+        if ($filter === null) {
+            return false;
+        }
+        try {
+            $attribute = $filter->getAttributeModel();
+        } catch (\Throwable $e) {
+            return false;
+        }
+
+        return $this->config->isLayeredMultiselectEnabledForAttribute($attribute);
     }
 
     /**

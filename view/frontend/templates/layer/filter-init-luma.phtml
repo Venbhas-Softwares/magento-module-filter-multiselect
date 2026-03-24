@@ -1,0 +1,21 @@
+<?php
+/**
+ * Luma/Blank: bind checkbox navigation via RequireJS (x-magento-init).
+ * Hyvä does not use this template; it uses layer/filter-js.phtml instead.
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Venbhas\FilterMultiselect\ViewModel\FilterConfig $filterConfig
+ */
+$filterConfig = $block->getData('filter_config');
+if (!$filterConfig instanceof \Venbhas\FilterMultiselect\ViewModel\FilterConfig
+    || !$filterConfig->shouldUseRequireJsForCheckboxNav()) {
+    return;
+}
+?>
+<script type="text/x-magento-init">
+{
+    "body": {
+        "Venbhas_FilterMultiselect/js/filter-multiselect": {}
+    }
+}
+</script>
