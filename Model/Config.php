@@ -23,7 +23,8 @@ class Config
      */
     public function __construct(
         private readonly ScopeConfigInterface $scopeConfig
-    ) {}
+    ) {
+    }
 
     /**
      * Master switch: module / extension active (Stores > Configuration > Venbhas).
@@ -40,8 +41,12 @@ class Config
     }
 
     /**
-     * @deprecated Use isExtensionEnabled(). Kept for backward compatibility.
-     * @see isExtensionEnabled()
+     * Legacy alias for whether the extension is enabled.
+     *
+     * @param string|int|null $scopeCode Store code or ID; null uses the current store.
+     *
+     * @deprecated 1.0.0 Vendor code should call isExtensionEnabled() for clearer intent.
+     * @see \Venbhas\FilterMultiselect\Model\Config::isExtensionEnabled()
      */
     public function isEnabled(string|int|null $scopeCode = null): bool
     {
@@ -64,9 +69,12 @@ class Config
 
     /**
      * Whether layered navigation may use multi-select UX for this catalog attribute.
-     * Requires: extension enabled, global multi-select enabled, and per-attribute flag.
      *
-     * @param \Magento\Framework\DataObject|null $attribute EAV/catalog attribute with getData()
+     * Requires extension enabled, global multi-select enabled, and per-attribute flag.
+     *
+     * @param \Magento\Framework\DataObject|null $attribute EAV/catalog attribute with getData().
+     *
+     * @return bool
      */
     public function isLayeredMultiselectEnabledForAttribute($attribute): bool
     {

@@ -14,10 +14,13 @@ use Magento\Swatches\Helper\Data as SwatchDataHelper;
 class SwatchRequestAttributesPlugin
 {
     /**
-     * @param SwatchDataHelper $subject
-     * @param ProductInterface $parentProduct
-     * @param array<string, mixed> $attributes
-     * @return array{0: ProductInterface, 1: array<string, mixed>}
+     * Flatten multi-select attribute values before loading a variation by fallback.
+     *
+     * @param SwatchDataHelper $subject Swatch data helper.
+     * @param ProductInterface $parentProduct Parent configurable product.
+     * @param array $attributes Selected attribute codes and values.
+     *
+     * @return array
      */
     public function beforeLoadVariationByFallback(
         SwatchDataHelper $subject,
@@ -28,10 +31,13 @@ class SwatchRequestAttributesPlugin
     }
 
     /**
-     * @param SwatchDataHelper $subject
-     * @param ProductInterface $configurableProduct
-     * @param array<string, mixed> $requiredAttributes
-     * @return array{0: ProductInterface, 1: array<string, mixed>}
+     * Flatten multi-select attribute map before loading first variation with an image.
+     *
+     * @param SwatchDataHelper $subject Swatch data helper.
+     * @param ProductInterface $configurableProduct Configurable product.
+     * @param array $requiredAttributes Required attribute codes and values.
+     *
+     * @return array
      */
     public function beforeLoadFirstVariationWithImage(
         SwatchDataHelper $subject,
@@ -42,10 +48,13 @@ class SwatchRequestAttributesPlugin
     }
 
     /**
-     * @param SwatchDataHelper $subject
-     * @param ProductInterface $configurableProduct
-     * @param array<string, mixed> $requiredAttributes
-     * @return array{0: ProductInterface, 1: array<string, mixed>}
+     * Flatten multi-select attribute map before loading first variation with swatch image.
+     *
+     * @param SwatchDataHelper $subject Swatch data helper.
+     * @param ProductInterface $configurableProduct Configurable product.
+     * @param array $requiredAttributes Required attribute codes and values.
+     *
+     * @return array
      */
     public function beforeLoadFirstVariationWithSwatchImage(
         SwatchDataHelper $subject,
@@ -56,8 +65,11 @@ class SwatchRequestAttributesPlugin
     }
 
     /**
-     * @param array<string, mixed> $attributes
-     * @return array<string, mixed>
+     * Normalize to scalar option ids per attribute; drop empty values.
+     *
+     * @param array $attributes Attribute code to value map (values may be arrays).
+     *
+     * @return array
      */
     private function normalizeConfigurableAttributeMap(array $attributes): array
     {

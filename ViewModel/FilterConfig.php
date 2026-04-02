@@ -26,7 +26,8 @@ class FilterConfig implements ArgumentInterface
     public function __construct(
         private readonly Config $config,
         private readonly ScopeConfigInterface $scopeConfig
-    ) {}
+    ) {
+    }
 
     /**
      * Whether the extension is enabled at store scope.
@@ -37,7 +38,10 @@ class FilterConfig implements ArgumentInterface
     }
 
     /**
-     * @deprecated Use isExtensionEnabled()
+     * Legacy alias for whether the extension is enabled in the current store.
+     *
+     * @deprecated 1.0.0 Use isExtensionEnabled() in new theme and module code.
+     * @see \Venbhas\FilterMultiselect\ViewModel\FilterConfig::isExtensionEnabled()
      */
     public function isEnabled(): bool
     {
@@ -63,6 +67,10 @@ class FilterConfig implements ArgumentInterface
 
     /**
      * Multi-select checkboxes for this layered navigation filter (attribute must opt in).
+     *
+     * @param FilterInterface|null $filter Layer filter for the current block render.
+     *
+     * @return bool
      */
     public function isMultiselectForFilter(?FilterInterface $filter): bool
     {

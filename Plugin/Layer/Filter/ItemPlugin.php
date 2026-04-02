@@ -23,6 +23,10 @@ class ItemPlugin
     /** @var UrlInterface */
     private $url;
 
+    /**
+     * @param HttpRequest $request Current HTTP request (query parameters).
+     * @param UrlInterface $url Front-controller URL builder.
+     */
     public function __construct(
         HttpRequest $request,
         UrlInterface $url
@@ -32,8 +36,9 @@ class ItemPlugin
     }
 
     /**
-     * Replace remove URL with one that omits this filter's param (fixes trash icon in both themes).
-     * Always applied so the remove link works regardless of module config or Item implementation.
+     * Replace remove URL for core Item only (clear whole filter param).
+     * Venbhas Item::getRemoveUrl() already builds correct URLs: full clear for multi-value state
+     * chips, or partial clear when unchecking one checkbox — do not overwrite that result.
      *
      * @param FilterItem $subject
      * @param string $result Original getRemoveUrl() result
@@ -41,6 +46,10 @@ class ItemPlugin
      */
     public function afterGetRemoveUrl(FilterItem $subject, string $result): string
     {
+        if ($subject instanceof \Venbhas\FilterMultiselect\Model\Layer\Filter\Item) {
+            return $result;
+        }
+
         try {
             $filter = $subject->getFilter();
             $filterCode = $filter->getRequestVar();

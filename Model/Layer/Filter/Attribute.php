@@ -194,7 +194,9 @@ class Attribute extends CatalogSearchAttribute
     /**
      * Faceted counts for the current category/search scope without layered navigation filters applied.
      *
-     * @return array<string, array<string, mixed>>|null Null = use parent (filtered collection)
+     * @param ProductAttributeInterface $attribute Attribute whose option counts are loaded.
+     *
+     * @return array|null Null = use parent (filtered collection)
      */
     private function getBaseLayerFacetedData(ProductAttributeInterface $attribute): ?array
     {
@@ -230,13 +232,21 @@ class Attribute extends CatalogSearchAttribute
     }
 
     /**
+     * Add one select option row to the layered navigation item builder.
+     *
      * Mirrors Magento\CatalogSearch\Model\Layer\Filter\Attribute::buildOptionData (private there).
      *
-     * @param array<string, mixed> $option
-     * @param array<string, array<string, mixed>> $optionsFacetedData
+     * @param array $option Option metadata (value, label) from the attribute.
+     * @param bool $isAttributeFilterable Whether the filter hides options with zero results.
+     * @param array $optionsFacetedData Facet counts keyed by option value.
+     *
+     * @return void
      */
-    private function buildOptionDataRow(array $option, bool $isAttributeFilterable, array $optionsFacetedData): void
-    {
+    private function buildOptionDataRow(
+        array $option,
+        bool $isAttributeFilterable,
+        array $optionsFacetedData
+    ): void {
         $value = $this->getOptionValueFromOption($option);
         if ($value === false) {
             return;
@@ -254,8 +264,11 @@ class Attribute extends CatalogSearchAttribute
     }
 
     /**
-     * @param array<string, mixed> $option
-     * @return bool|string
+     * Resolve the option id used for facet matching and URL state.
+     *
+     * @param array $option Option row from the attribute frontend select options.
+     *
+     * @return bool|string False when the option has no usable value.
      */
     private function getOptionValueFromOption(array $option)
     {
@@ -266,8 +279,12 @@ class Attribute extends CatalogSearchAttribute
     }
 
     /**
-     * @param int|string $value
-     * @param array<string, array<string, mixed>> $optionsFacetedData
+     * Read the product count for an option value from precomputed facet data.
+     *
+     * @param int|string $value Option id as stored in facets or request state.
+     * @param array $optionsFacetedData Facet payload keyed by string or int option value.
+     *
+     * @return int
      */
     private function getOptionCountFromFacets($value, array $optionsFacetedData): int
     {

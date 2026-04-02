@@ -7,5 +7,9 @@
  * @var \Magento\Framework\View\Element\Template $block
  */
 ?>
-<script src="<?= $block->escapeUrl($block->getViewFileUrl('Venbhas_FilterMultiselect::js/venbhas-filter-multiselect.js')) ?>"
-        defer></script>
+<script
+    src="<?= $escaper->escapeUrl(
+        $block->getViewFileUrl('Venbhas_FilterMultiselect::js/venbhas-filter-multiselect.js')
+    ) ?>"
+    defer
+></script>

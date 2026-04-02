@@ -90,10 +90,12 @@ class Item extends CoreItem
     }
 
     /**
-     * Get URL to remove this filter from the active state (trash icon).
+     * Get URL to remove this filter value from the active state.
      *
-     * When multi-select is enabled, each state chip represents this filter's current selection;
-     * removing the chip removes the whole filter from the URL (no dependency on value/label match).
+     * - Layer state chip (Attribute::apply): one state item per attribute with value = full selection
+     *   as an array with 2+ option ids → remove the entire attribute from the URL.
+     * - Sidebar checkbox row: value is a single option → remove only that id from the current
+     *   multi-select array so other checked options stay applied.
      *
      * @return string
      */
@@ -104,13 +106,36 @@ class Item extends CoreItem
         }
 
         $filterCode = $this->getFilter()->getRequestVar();
+        $itemValue = $this->getValue();
 
-        return $this->_buildUrl($filterCode, []);
+        // Aggregated "Active filtering" row: value holds every selected option for this attribute.
+        if (is_array($itemValue) && count($itemValue) > 1) {
+            return $this->_buildUrl($filterCode, []);
+        }
+
+        $currentValues = $this->_getCurrentFilterValues($filterCode);
+        $valuesToRemove = is_array($itemValue) ? array_values($itemValue) : [$itemValue];
+
+        $remove = [];
+        foreach ($valuesToRemove as $v) {
+            $remove[(string) $v] = true;
+        }
+
+        $remaining = [];
+        foreach ($currentValues as $cv) {
+            if (!isset($remove[(string) $cv])) {
+                $remaining[] = $cv;
+            }
+        }
+
+        return $this->_buildUrl($filterCode, $remaining);
     }
 
     /**
+     * Mirror Luma clear-link behavior using the multi-select-safe remove URL.
+     *
      * Luma uses getClearLinkUrl() for the remove link when the filter defines clear link text.
-     * Use the same multi-select-safe URL as getRemoveUrl().
+     * Delegates to getRemoveUrl() so active chips clear the full filter param consistently.
      *
      * @return false|string
      */
@@ -129,7 +154,8 @@ class Item extends CoreItem
     }
 
     /**
-     * Check if this filter value is currently active (multi-select).
+     * Whether this filter value is active when multi-select mode is enabled.
+     *
      * Handles both scalar and array item values (state items may store arrays).
      *
      * @return bool
@@ -263,10 +289,12 @@ class Item extends CoreItem
     }
 
     /**
-     * Build the base query parameter array, excluding the given filter code
-     * and standard navigation parameters that should reset on filter change.
+     * Build the base query parameter array for layered navigation URLs.
      *
-     * @param string $filterCode
+     * Omits the active filter code plus pagination, sort, and store keys so only relevant params carry over.
+     *
+     * @param string $filterCode Request parameter name for this filter.
+     *
      * @return array
      */
     protected function _getBaseParams(string $filterCode): array

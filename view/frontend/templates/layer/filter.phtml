@@ -58,14 +58,19 @@ foreach ($filterItems as $filterItem) {
                 : $filterItem->getSingleSelectUrl();
         }
         ?>
+        <?php
+        $filterItemDomId = 'filter-item-' . (string) $filterItem->getValue();
+        ?>
         <li class="item<?= $isSelected ? ' active' : '' ?>">
             <?php if ($useCheckboxes): ?>
-                <?php $itemId = 'filter-item-' . $escaper->escapeHtmlAttr($filterItem->getValue()); ?>
-                <label for="<?= $itemId ?>" class="flex justify-between py-1 cursor-pointer hover:text-black">
+                <label
+                    for="<?= $escaper->escapeHtmlAttr($filterItemDomId) ?>"
+                    class="flex justify-between py-1 cursor-pointer hover:text-black"
+                >
                     <span class="flex items-center gap-2">
                         <input type="checkbox"
                                class="filter-checkbox"
-                               id="<?= $itemId ?>"
+                               id="<?= $escaper->escapeHtmlAttr($filterItemDomId) ?>"
                                <?= $isSelected ? 'checked="checked"' : '' ?>
                                data-url="<?= $escaper->escapeHtmlAttr($filterUrl) ?>"
                         />
@@ -79,10 +84,20 @@ foreach ($filterItems as $filterItem) {
                 <?php if ($filterItem->getCount() > 0): ?>
                     <a href="<?= $escaper->escapeUrl($filterUrl) ?>"
                        class="flex justify-between py-1 hover:text-black<?= $isSelected ? ' font-semibold' : '' ?>"
-                        <?php if ((int) $filterItem->getCount() === 1): ?>
-                        aria-label="<?= $escaper->escapeHtmlAttr(__('%1 filter, 1 available product', strip_tags((string)$filterItem->getLabel()))) ?>"
+                        <?php
+                        $filterLabelPlain = strip_tags((string) $filterItem->getLabel());
+                        if ((int) $filterItem->getCount() === 1): ?>
+                                    aria-label="<?= $escaper->escapeHtmlAttr(
+                                        __('%1 filter, 1 available product', $filterLabelPlain)
+                                                ) ?>"
                         <?php else: ?>
-                        aria-label="<?= $escaper->escapeHtmlAttr(__('%1 filter, %2 available products', strip_tags((string)$filterItem->getLabel()), $filterItem->getCount())) ?>"
+                                    aria-label="<?= $escaper->escapeHtmlAttr(
+                                        __(
+                                            '%1 filter, %2 available products',
+                                            $filterLabelPlain,
+                                            $filterItem->getCount()
+                                        )
+                                                ) ?>"
                         <?php endif; ?>
                     >
                         <span><?= /* @noEscape */ $filterItem->getLabel() ?></span>

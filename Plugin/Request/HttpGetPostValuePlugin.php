@@ -14,8 +14,11 @@ class HttpGetPostValuePlugin
     private const ACTION_NAME = 'catalog_product_attribute_save';
 
     /**
-     * @param Http $subject
-     * @param array|null|false $result
+     * Default venbhas_layered_multiselect when the admin form omits the field on save.
+     *
+     * @param Http $subject Magento HTTP request.
+     * @param array|null|false $result Posted field values from the parent method.
+     *
      * @return array|null|false
      */
     public function afterGetPostValue(Http $subject, $result)
@@ -27,6 +30,12 @@ class HttpGetPostValuePlugin
             return $result;
         }
         if (!array_key_exists('venbhas_layered_multiselect', $result)) {
+            // UI form did not render our field (e.g. swatch types before they were in valuesForEnable).
+            // Do not force 0 or every attribute save wipes catalog_eav_attribute.venbhas_layered_multiselect.
+            $input = (string) ($result['frontend_input'] ?? '');
+            if ($input === 'swatch_visual' || $input === 'swatch_text') {
+                return $result;
+            }
             $result['venbhas_layered_multiselect'] = 0;
         }
 

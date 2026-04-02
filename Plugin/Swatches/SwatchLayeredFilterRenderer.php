@@ -22,6 +22,12 @@ class SwatchLayeredFilterRenderer extends SwatchFilterRendererPlugin
      */
     private Config $config;
 
+    /**
+     * @param \Magento\Framework\View\LayoutInterface $layout
+     * @param SwatchHelper $swatchHelper
+     * @param Config $config
+     */
+
     public function __construct(
         \Magento\Framework\View\LayoutInterface $layout,
         SwatchHelper $swatchHelper,
@@ -32,9 +38,12 @@ class SwatchLayeredFilterRenderer extends SwatchFilterRendererPlugin
     }
 
     /**
-     * @param FilterRendererBlock $subject
-     * @param \Closure $proceed
-     * @param FilterInterface $filter
+     * Use standard filter rendering when multi-select is enabled for a swatch attribute.
+     *
+     * @param FilterRendererBlock $subject Filter renderer block.
+     * @param \Closure $proceed Original render closure.
+     * @param FilterInterface $filter Layer filter instance.
+     *
      * @return mixed
      */
     public function aroundRender(

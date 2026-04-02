@@ -26,7 +26,8 @@ $filterHasActiveSelection = static function ($filter) use ($block): bool {
             }
         }
     } catch (\Throwable $e) {
-        // ignore
+        // Layer state can be unavailable during some renders; treat as no match.
+        unset($e);
     }
     return false;
 };
@@ -57,10 +58,11 @@ $accordionMageInitJson = json_encode(
     JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP
 );
 if ($accordionMageInitJson === false) {
-    $accordionMageInitJson = '{"accordion":{"openedState":"active","collapsible":true,"active":false,"multipleCollapsible":false}}';
+    $accordionMageInitJson = '{"accordion":{'
+        . '"openedState":"active","collapsible":true,"active":false,"multipleCollapsible":false}}';
 }
 ?>
-<?php if ($block->canShowBlock()) : ?>
+<?php if ($block->canShowBlock()): ?>
     <style>
         /* If mage/accordion skips "active" indices, still show sections that have applied filters */
         #narrow-by-list .filter-options-item._filter-active > [data-role="content"] {
@@ -86,36 +88,46 @@ if ($accordionMageInitJson === false) {
     }'>
         <?php $filtered = count($block->getLayer()->getState()->getFilters()) ?>
         <div class="block-title filter-title" data-count="<?= /* @noEscape */ $filtered ?>">
-            <strong data-role="title"><?= $block->escapeHtml(__('Shop By')); ?></strong>
+            <strong data-role="title"><?= $escaper->escapeHtml(__('Shop By')); ?></strong>
         </div>
         <div class="block-content filter-content">
             <?= $block->getChildHtml('state') ?>
 
-            <?php if ($block->getLayer()->getState()->getFilters()) : ?>
+            <?php if ($block->getLayer()->getState()->getFilters()): ?>
                 <div class="block-actions filter-actions">
-                    <a href="<?= $block->escapeUrl($block->getClearUrl()) ?>" class="action clear filter-clear">
-                        <span><?= $block->escapeHtml(__('Clear All')) ?></span>
+                    <a href="<?= $escaper->escapeUrl($block->getClearUrl()) ?>" class="action clear filter-clear">
+                        <span><?= $escaper->escapeHtml(__('Clear All')) ?></span>
                     </a>
                 </div>
             <?php endif; ?>
             <?php $wrapOptions = false; ?>
-            <?php foreach ($block->getFilters() as $filter) : ?>
-                <?php if ($filter->getItemsCount()) : ?>
-                    <?php if (!$wrapOptions) : ?>
-                        <strong role="heading" aria-level="2" class="block-subtitle filter-subtitle"><?= $block->escapeHtml(__('Shopping Options')) ?></strong>
-                        <div class="filter-options" id="narrow-by-list" data-role="content" data-mage-init='<?= /* @noEscape */ $accordionMageInitJson ?>'>
+            <?php foreach ($block->getFilters() as $filter): ?>
+                <?php if ($filter->getItemsCount()): ?>
+                    <?php if (!$wrapOptions): ?>
+                        <strong role="heading" aria-level="2" class="block-subtitle filter-subtitle">
+                            <?= $escaper->escapeHtml(__('Shopping Options')) ?>
+                        </strong>
+                        <div class="filter-options"
+                             id="narrow-by-list"
+                             data-role="content"
+                             data-mage-init='<?= /* @noEscape */ $accordionMageInitJson ?>'>
                         <?php $wrapOptions = true;
                         endif; ?>
                     <?php $sectionActive = $filterHasActiveSelection($filter); ?>
-                    <div data-role="collapsible" class="filter-options-item<?= $sectionActive ? ' _filter-active' : '' ?>">
-                        <div data-role="title" class="filter-options-title"><?= $block->escapeHtml(__($filter->getName())) ?></div>
-                        <div data-role="content" class="filter-options-content"><?= /* @noEscape */ $block->getChildBlock('renderer')->render($filter) ?></div>
+                    <div data-role="collapsible"
+                         class="filter-options-item<?= $sectionActive ? ' _filter-active' : '' ?>">
+                        <div data-role="title" class="filter-options-title">
+                            <?= $escaper->escapeHtml(__($filter->getName())) ?>
+                        </div>
+                        <div data-role="content" class="filter-options-content">
+                            <?= /* @noEscape */ $block->getChildBlock('renderer')->render($filter) ?>
+                        </div>
                     </div>
                 <?php endif; ?>
             <?php endforeach; ?>
-            <?php if ($wrapOptions) : ?>
+            <?php if ($wrapOptions): ?>
                 </div>
-            <?php else : ?>
+            <?php else: ?>
                 <script>
                     require([
                         'jquery'

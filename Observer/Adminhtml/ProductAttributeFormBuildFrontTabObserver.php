@@ -19,11 +19,21 @@ class ProductAttributeFormBuildFrontTabObserver implements ObserverInterface
      */
     private $yesNo;
 
+    /**
+     * @param Yesno $yesNo Yes/No source model for the multiselect field.
+     */
     public function __construct(Yesno $yesNo)
     {
         $this->yesNo = $yesNo;
     }
 
+    /**
+     * Append "Allow Multi-Select in Layered Navigation" to the Storefront Properties fieldset.
+     *
+     * @param Observer $observer Event observer with the attribute form instance.
+     *
+     * @return void
+     */
     public function execute(Observer $observer): void
     {
         /** @var \Magento\Framework\Data\Form $form */
@@ -47,7 +57,11 @@ class ProductAttributeFormBuildFrontTabObserver implements ObserverInterface
                 'label' => __('Allow Multi-Select in Layered Navigation'),
                 'title' => __('Allow Multi-Select in Layered Navigation'),
                 'note' => __(
-                    'When Venbhas Filter Multiselect is enabled and "Allow Multi-Select in Layered Navigation (Global)" is Yes (Stores > Configuration > Venbhas), shoppers can select multiple values for this attribute only if you set this to Yes. If this is No, this attribute stays single-select on the storefront.'
+                    'When Venbhas Filter Multiselect is enabled and '
+                    . '"Allow Multi-Select in Layered Navigation (Global)" is Yes '
+                    . '(Stores > Configuration > Venbhas), shoppers can select multiple values for this '
+                    . 'attribute only if you set this to Yes. If this is No, this attribute stays '
+                    . 'single-select on the storefront.'
                 ),
                 'values' => $this->yesNo->toOptionArray(),
             ],

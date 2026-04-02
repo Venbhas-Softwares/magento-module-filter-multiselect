@@ -13,6 +13,8 @@
                         <item name="select" xsi:type="string">select</item>
                         <item name="multiselect" xsi:type="string">multiselect</item>
                         <item name="price" xsi:type="string">price</item>
+                        <item name="swatch_visual" xsi:type="string">swatch_visual</item>
+                        <item name="swatch_text" xsi:type="string">swatch_text</item>
                     </item>
                     <item name="source" xsi:type="string">product_attribute</item>
                     <item name="default" xsi:type="number">0</item>

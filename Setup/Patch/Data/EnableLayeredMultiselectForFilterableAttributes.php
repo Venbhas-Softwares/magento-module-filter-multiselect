@@ -18,21 +18,39 @@ class EnableLayeredMultiselectForFilterableAttributes implements DataPatchInterf
      */
     private $moduleDataSetup;
 
+    /**
+     * @param ModuleDataSetupInterface $moduleDataSetup Module data setup helper.
+     */
     public function __construct(ModuleDataSetupInterface $moduleDataSetup)
     {
         $this->moduleDataSetup = $moduleDataSetup;
     }
 
+    /**
+     * No prerequisite data patches.
+     *
+     * @return array
+     */
     public static function getDependencies(): array
     {
         return [];
     }
 
+    /**
+     * No alternative patch names for this migration.
+     *
+     * @return array
+     */
     public function getAliases(): array
     {
         return [];
     }
 
+    /**
+     * Turn on layered multiselect for attributes already filterable in navigation.
+     *
+     * @return void
+     */
     public function apply(): void
     {
         $setup = $this->moduleDataSetup;

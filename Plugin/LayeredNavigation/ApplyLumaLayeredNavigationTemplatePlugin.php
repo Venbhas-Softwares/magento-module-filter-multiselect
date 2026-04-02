@@ -18,15 +18,27 @@ class ApplyLumaLayeredNavigationTemplatePlugin
     private const LAYERED_NAV_TEMPLATE = 'Venbhas_FilterMultiselect::layer/navigation-view.phtml';
 
     /**
+     * Magento module enablement helper.
+     *
      * @var ModuleManager
      */
     private $moduleManager;
 
+    /**
+     * @param ModuleManager $moduleManager Magento module manager.
+     */
     public function __construct(ModuleManager $moduleManager)
     {
         $this->moduleManager = $moduleManager;
     }
 
+    /**
+     * Set layered navigation template on Luma when Hyvä Theme is not enabled.
+     *
+     * @param Template $subject Layered navigation template block.
+     *
+     * @return void
+     */
     public function beforeToHtml(Template $subject): void
     {
         $name = (string) $subject->getNameInLayout();
