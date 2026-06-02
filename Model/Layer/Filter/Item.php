@@ -52,6 +52,10 @@ class Item extends CoreItem
      */
     private function isMultiselectModeForThisItem(): bool
     {
+        if (!$this->config->isExtensionEnabled()) {
+            return false;
+        }
+
         try {
             $attribute = $this->getFilter()->getAttributeModel();
         } catch (\Throwable $e) {

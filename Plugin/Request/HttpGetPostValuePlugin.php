@@ -5,24 +5,29 @@ declare(strict_types=1);
 namespace Venbhas\FilterMultiselect\Plugin\Request;
 
 use Magento\Framework\App\Request\Http;
+use Venbhas\FilterMultiselect\Plugin\AbstractPlugin;
 
 /**
  * Admin attribute form omits unchecked checkbox keys; default venbhas_layered_multiselect to 0 on save.
  */
-class HttpGetPostValuePlugin
+class HttpGetPostValuePlugin extends AbstractPlugin
 {
     private const ACTION_NAME = 'catalog_product_attribute_save';
 
     /**
      * Default venbhas_layered_multiselect when the admin form omits the field on save.
      *
-     * @param Http $subject Magento HTTP request.
-     * @param array|null|false $result Posted field values from the parent method.
+     * @param Http $subject Magento HTTP request
+     * @param array|null|false $result Posted field values from the parent method
      *
      * @return array|null|false
      */
     public function afterGetPostValue(Http $subject, $result)
     {
+        if (!$this->isModuleEnabled()) {
+            return $result;
+        }
+
         if (!is_array($result)) {
             return $result;
         }

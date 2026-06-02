@@ -124,6 +124,10 @@ class Attribute extends CatalogSearchAttribute
      */
     public function apply(RequestInterface $request)
     {
+        if (!$this->config->isExtensionEnabled()) {
+            return parent::apply($request);
+        }
+
         if (!$this->config->isLayeredMultiselectEnabledForAttribute($this->getAttributeModel())) {
             return parent::apply($request);
         }
@@ -167,6 +171,10 @@ class Attribute extends CatalogSearchAttribute
     {
         /** @var EavAttribute $attribute */
         $attribute = $this->getAttributeModel();
+        if (!$this->config->isExtensionEnabled()) {
+            return parent::_getItemsData();
+        }
+
         if (!$this->config->isLayeredMultiselectEnabledForAttribute($attribute)) {
             return parent::_getItemsData();
         }

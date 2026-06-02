@@ -60,6 +60,16 @@ foreach ($filterItems as $filterItem) {
         ?>
         <?php
         $filterItemDomId = 'filter-item-' . (string) $filterItem->getValue();
+        $filterLabelPlain = strip_tags((string) $filterItem->getLabel());
+        if ((int) $filterItem->getCount() === 1) {
+            $filterAriaLabel = (string) __('%1 filter, 1 available product', $filterLabelPlain);
+        } else {
+            $filterAriaLabel = (string) __(
+                '%1 filter, %2 available products',
+                $filterLabelPlain,
+                $filterItem->getCount()
+            );
+        }
         ?>
         <li class="item<?= $isSelected ? ' active' : '' ?>">
             <?php if ($useCheckboxes): ?>
@@ -77,39 +87,25 @@ foreach ($filterItems as $filterItem) {
                         <span><?= /* @noEscape */ $filterItem->getLabel() ?></span>
                     </span>
                     <?php if ($showProductCount): ?>
-                        <span class="count">(<?= (int)$filterItem->getCount() ?>)</span>
+                        <span class="count"><?= (int) $filterItem->getCount() ?></span>
                     <?php endif; ?>
                 </label>
             <?php else: ?>
                 <?php if ($filterItem->getCount() > 0): ?>
                     <a href="<?= $escaper->escapeUrl($filterUrl) ?>"
                        class="flex justify-between py-1 hover:text-black<?= $isSelected ? ' font-semibold' : '' ?>"
-                        <?php
-                        $filterLabelPlain = strip_tags((string) $filterItem->getLabel());
-                        if ((int) $filterItem->getCount() === 1): ?>
-                                    aria-label="<?= $escaper->escapeHtmlAttr(
-                                        __('%1 filter, 1 available product', $filterLabelPlain)
-                                                ) ?>"
-                        <?php else: ?>
-                                    aria-label="<?= $escaper->escapeHtmlAttr(
-                                        __(
-                                            '%1 filter, %2 available products',
-                                            $filterLabelPlain,
-                                            $filterItem->getCount()
-                                        )
-                                                ) ?>"
-                        <?php endif; ?>
+                       aria-label="<?= $escaper->escapeHtmlAttr($filterAriaLabel) ?>"
                     >
                         <span><?= /* @noEscape */ $filterItem->getLabel() ?></span>
                         <?php if ($showProductCount): ?>
-                            <span class="count">(<?= (int)$filterItem->getCount() ?>)</span>
+                            <span class="count"><?= (int) $filterItem->getCount() ?></span>
                         <?php endif; ?>
                     </a>
                 <?php else: ?>
                     <span class="flex justify-between py-1 hover:text-black">
                         <span><?= /* @noEscape */ $filterItem->getLabel() ?></span>
                         <?php if ($showProductCount): ?>
-                            <span class="count">(<?= (int)$filterItem->getCount() ?>)</span>
+                            <span class="count"><?= (int) $filterItem->getCount() ?></span>
                         <?php endif; ?>
                     </span>
                 <?php endif; ?>

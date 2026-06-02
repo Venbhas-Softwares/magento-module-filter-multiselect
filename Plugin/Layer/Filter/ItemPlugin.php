@@ -13,24 +13,30 @@ namespace Venbhas\FilterMultiselect\Plugin\Layer\Filter;
 use Magento\Catalog\Model\Layer\Filter\Item as FilterItem;
 use Magento\Framework\App\Request\Http as HttpRequest;
 use Magento\Framework\UrlInterface;
+use Venbhas\FilterMultiselect\Model\Config\ModuleEnabledGuard;
+use Venbhas\FilterMultiselect\Plugin\AbstractPlugin;
 
-class ItemPlugin
+class ItemPlugin extends AbstractPlugin
 {
     private const SKIP_PARAMS = ['___from_store', '___store', 'q', 'p', 'limit', 'dir', 'order'];
 
     /** @var HttpRequest */
     private $request;
+
     /** @var UrlInterface */
     private $url;
 
     /**
-     * @param HttpRequest $request Current HTTP request (query parameters).
-     * @param UrlInterface $url Front-controller URL builder.
+     * @param ModuleEnabledGuard $moduleEnabledGuard Module enabled guard
+     * @param HttpRequest $request Current HTTP request (query parameters)
+     * @param UrlInterface $url Front-controller URL builder
      */
     public function __construct(
+        ModuleEnabledGuard $moduleEnabledGuard,
         HttpRequest $request,
         UrlInterface $url
     ) {
+        parent::__construct($moduleEnabledGuard);
         $this->request = $request;
         $this->url = $url;
     }
@@ -46,6 +52,10 @@ class ItemPlugin
      */
     public function afterGetRemoveUrl(FilterItem $subject, string $result): string
     {
+        if (!$this->isModuleEnabled()) {
+            return $result;
+        }
+
         if ($subject instanceof \Venbhas\FilterMultiselect\Model\Layer\Filter\Item) {
             return $result;
         }

@@ -6,13 +6,14 @@ namespace Venbhas\FilterMultiselect\Observer\Adminhtml;
 
 use Magento\Config\Model\Config\Source\Yesno;
 use Magento\Framework\Event\Observer;
-use Magento\Framework\Event\ObserverInterface;
+use Venbhas\FilterMultiselect\Model\Config\ModuleEnabledGuard;
+use Venbhas\FilterMultiselect\Observer\AbstractObserver;
 
 /**
  * Adds "Allow Multi-Select in Layered Navigation" on the legacy Storefront Properties tab
  * (catalog → product attribute edit). Layered Navigation uses the same event.
  */
-class ProductAttributeFormBuildFrontTabObserver implements ObserverInterface
+class ProductAttributeFormBuildFrontTabObserver extends AbstractObserver
 {
     /**
      * @var Yesno
@@ -20,10 +21,14 @@ class ProductAttributeFormBuildFrontTabObserver implements ObserverInterface
     private $yesNo;
 
     /**
-     * @param Yesno $yesNo Yes/No source model for the multiselect field.
+     * @param ModuleEnabledGuard $moduleEnabledGuard Module enabled guard
+     * @param Yesno $yesNo Yes/No source model for the multiselect field
      */
-    public function __construct(Yesno $yesNo)
-    {
+    public function __construct(
+        ModuleEnabledGuard $moduleEnabledGuard,
+        Yesno $yesNo
+    ) {
+        parent::__construct($moduleEnabledGuard);
         $this->yesNo = $yesNo;
     }
 
@@ -34,7 +39,7 @@ class ProductAttributeFormBuildFrontTabObserver implements ObserverInterface
      *
      * @return void
      */
-    public function execute(Observer $observer): void
+    protected function executeWhenEnabled(Observer $observer): void
     {
         /** @var \Magento\Framework\Data\Form $form */
         $form = $observer->getForm();
