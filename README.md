@@ -2,10 +2,6 @@
 
 > Multi-select checkbox filtering for layered navigation attribute filters.
 
-[![Magento 2.4.8+](https://img.shields.io/badge/Magento-2.4.8%2B-orange?logo=magento)](https://devdocs.magento.com/)
-[![PHP 8.2+](https://img.shields.io/badge/PHP-8.2%20%7C%208.3%20%7C%208.4-blue?logo=php)](https://www.php.net/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Packagist](https://img.shields.io/packagist/v/venbhas/module-filter-multiselect)](https://packagist.org/packages/venbhas/module-filter-multiselect)
 
 ---
 
@@ -74,7 +70,8 @@ Navigate to **Admin → Stores → Configuration → Venbhas → Filter Multisel
 
 | Setting | Description | Default |
 |---------|-------------|---------|
-| Enable Multi-Select Attribute Filters | Toggles checkbox rendering for attribute filters. When disabled, reverts to standard Magento single-select links. | Yes |
+| Enable Extension | Master switch for the module. When disabled, layered navigation behaves like core Magento. | Yes |
+| Enable Multi-Select Attribute Filters | Global permission for checkbox rendering. Each attribute must also opt in via **Use in Layered Navigation Multi-Select**. | Yes |
 
 The setting is configurable at Default, Website, and Store View scope.
 
@@ -109,27 +106,32 @@ Price filters always render as standard links regardless of the module setting. 
 ```
 Venbhas/FilterMultiselect/
 ├── Model/
-│   ├── Config.php                          # Reads admin configuration
+│   ├── Config.php
+│   ├── Config/ModuleEnabledGuard.php
 │   └── Layer/Filter/
-│       ├── Attribute.php                   # Core multi-select filter logic
-│       └── Item.php                        # URL generation (add/remove values)
+│       ├── Attribute.php
+│       └── Item.php
 ├── ViewModel/
-│   └── FilterConfig.php                    # Provides config to templates
+│   └── FilterConfig.php
+├── Plugin/
+│   ├── Layer/Filter/ItemPlugin.php
+│   ├── Request/HttpGetPostValuePlugin.php
+│   └── Swatches/
+├── Observer/Adminhtml/
+├── Setup/Patch/Data/
 ├── etc/
-│   ├── module.xml                          # Module declaration
-│   ├── di.xml                              # Dependency injection config
-│   ├── config.xml                          # Default configuration values
-│   ├── acl.xml                             # Admin ACL resource
-│   └── adminhtml/system.xml               # Admin configuration UI
+│   ├── module.xml, di.xml, config.xml, db_schema.xml
+│   ├── acl.xml
+│   └── adminhtml/system.xml, events.xml
 ├── view/frontend/
 │   ├── layout/
-│   │   ├── default.xml                     # Loads filter-js.phtml globally
+│   │   ├── default.xml
 │   │   ├── catalog_category_view_type_layered.xml
 │   │   └── catalogsearch_result_index.xml
 │   ├── templates/layer/
-│   │   ├── filter.phtml                    # Filter rendering template
-│   │   └── filter-js.phtml                 # References storefront JS asset
-│   └── web/js/venbhas-filter-multiselect.js  # Checkbox → URL navigation
+│   │   ├── filter.phtml
+│   │   └── filter-js.phtml
+│   └── web/js/venbhas-filter-multiselect.js
 ├── composer.json
 ├── registration.php
 └── LICENSE

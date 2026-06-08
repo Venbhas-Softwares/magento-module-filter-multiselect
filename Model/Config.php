@@ -41,19 +41,6 @@ class Config
     }
 
     /**
-     * Legacy alias for whether the extension is enabled.
-     *
-     * @param string|int|null $scopeCode Store code or ID; null uses the current store.
-     *
-     * @deprecated 1.0.0 Vendor code should call isExtensionEnabled() for clearer intent.
-     * @see \Venbhas\FilterMultiselect\Model\Config::isExtensionEnabled()
-     */
-    public function isEnabled(string|int|null $scopeCode = null): bool
-    {
-        return $this->isExtensionEnabled($scopeCode);
-    }
-
-    /**
      * Global storefront permission for layered navigation multi-select (still requires per-attribute Yes).
      *
      * @param string|int|null $scopeCode Store code or ID; null uses the current store.

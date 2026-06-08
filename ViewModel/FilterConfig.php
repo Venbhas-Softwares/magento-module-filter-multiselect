@@ -30,42 +30,6 @@ class FilterConfig implements ArgumentInterface
     }
 
     /**
-     * Whether the extension is enabled at store scope.
-     */
-    public function isExtensionEnabled(): bool
-    {
-        return $this->config->isExtensionEnabled();
-    }
-
-    /**
-     * Legacy alias for whether the extension is enabled in the current store.
-     *
-     * @deprecated 1.0.0 Use isExtensionEnabled() in new theme and module code.
-     * @see \Venbhas\FilterMultiselect\ViewModel\FilterConfig::isExtensionEnabled()
-     */
-    public function isEnabled(): bool
-    {
-        return $this->config->isExtensionEnabled();
-    }
-
-    /**
-     * Global "allow multi-select in layered navigation" (still requires per-attribute opt-in).
-     */
-    public function isMultiselectGloballyEnabled(): bool
-    {
-        return $this->config->isMultiselectGloballyEnabled();
-    }
-
-    /**
-     * Luma/Blank: load RequireJS checkbox navigation only when extension and global multi-select may apply.
-     */
-    public function shouldUseRequireJsForCheckboxNav(): bool
-    {
-        return $this->config->isExtensionEnabled()
-            && $this->config->isMultiselectGloballyEnabled();
-    }
-
-    /**
      * Multi-select checkboxes for this layered navigation filter (attribute must opt in).
      *
      * @param FilterInterface|null $filter Layer filter for the current block render.
