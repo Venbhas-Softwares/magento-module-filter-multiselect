@@ -22,7 +22,7 @@ Price filters are intentionally left as single-select links, preserving the stan
 - Toggle on/off via **Magento Admin** without touching code
 - Configurable per **Default / Website / Store** scope
 - Compatible with **OpenSearch** and **Elasticsearch** backends
-- Storefront script (`venbhas-filter-multiselect.js`) expands the layered-nav section that contains the active filter after load (markers: `data-venbhas-has-active` on the option list, Luma accordion, Alpine `x-data`, swatch URL params)
+- Luma accordion expansion is included; optional Hyvä package adds Alpine.js panel expansion
 
 ---
 
@@ -43,6 +43,7 @@ Price filters are intentionally left as single-select links, preserving the stan
 
 ### Via Composer (recommended)
 
+**Luma / Blank theme:**
 ```bash
 composer require venbhas/module-filter-multiselect
 bin/magento module:enable Venbhas_FilterMultiselect
@@ -50,14 +51,26 @@ bin/magento setup:upgrade
 bin/magento cache:clean
 ```
 
+**Hyvä theme** (requires the base module plus the Hyvä integration package):
+```bash
+composer require venbhas/module-filter-multiselect venbhas/module-filter-multiselect-hyva
+bin/magento module:enable Venbhas_FilterMultiselect Venbhas_FilterMultiselectHyva
+bin/magento setup:upgrade
+bin/magento cache:clean
+```
+
+> On Hyvä stores, enable `Venbhas_FilterMultiselectHyva` so Hyvä templates override the Luma storefront files.
+
 ### Manual Installation
 
-1. Download or clone this repository.
-2. Copy the contents into `app/code/Venbhas/FilterMultiselect/`.
+1. Copy `Venbhas/FilterMultiselect/` into `app/code/`.
+2. For Hyvä, also copy `Venbhas/FilterMultiselectHyva/` into `app/code/`.
 3. Run the following commands from your Magento root:
 
 ```bash
 bin/magento module:enable Venbhas_FilterMultiselect
+# Hyvä only:
+# bin/magento module:enable Venbhas_FilterMultiselectHyva
 bin/magento setup:upgrade
 bin/magento cache:clean
 ```
@@ -103,38 +116,21 @@ Price filters always render as standard links regardless of the module setting. 
 
 ## Module Structure
 
+The extension is split into two packages:
+
+| Package | Module | Purpose |
+|---------|--------|---------|
+| `venbhas/module-filter-multiselect` | `Venbhas_FilterMultiselect` | Core logic, Luma/Blank templates, accordion JS |
+| `venbhas/module-filter-multiselect-hyva` | `Venbhas_FilterMultiselectHyva` | Hyvä templates (Tailwind), Alpine.js panel expansion |
+
 ```
-Venbhas/FilterMultiselect/
-├── Model/
-│   ├── Config.php
-│   ├── Config/ModuleEnabledGuard.php
-│   └── Layer/Filter/
-│       ├── Attribute.php
-│       └── Item.php
-├── ViewModel/
-│   └── FilterConfig.php
-├── Plugin/
-│   ├── Layer/Filter/ItemPlugin.php
-│   ├── Request/HttpGetPostValuePlugin.php
-│   └── Swatches/
-├── Observer/Adminhtml/
-├── Setup/Patch/Data/
+Venbhas/FilterMultiselect/          # Required (includes Luma storefront)
+├── Model/, Plugin/, Observer/, Setup/, ViewModel/
 ├── etc/
-│   ├── module.xml, di.xml, config.xml, db_schema.xml
-│   ├── acl.xml
-│   └── adminhtml/system.xml, events.xml
-├── view/frontend/
-│   ├── layout/
-│   │   ├── default.xml
-│   │   ├── catalog_category_view_type_layered.xml
-│   │   └── catalogsearch_result_index.xml
-│   ├── templates/layer/
-│   │   ├── filter.phtml
-│   │   └── filter-js.phtml
-│   └── web/js/venbhas-filter-multiselect.js
-├── composer.json
-├── registration.php
-└── LICENSE
+└── view/frontend/
+
+Venbhas/FilterMultiselectHyva/     # Hyvä storefront (optional)
+└── view/frontend/
 ```
 
 ---

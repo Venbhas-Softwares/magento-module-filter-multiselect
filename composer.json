@@ -1,6 +1,6 @@
 {
     "name": "venbhas/module-filter-multiselect",
-    "description": "Enable multi-select checkbox filtering for attribute filters in Magento layered navigation. Price filters use standard single-select links.",
+    "description": "Multi-select checkbox filtering for Magento layered navigation (Luma/Blank). Optional venbhas/module-filter-multiselect-hyva for Hyvä storefronts.",
     "type": "magento2-module",
     "version": "1.1.0",
     "require": {
