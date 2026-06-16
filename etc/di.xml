@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <!-- Replace core Filter Item class with our multi-select version -->
+    <preference for="Magento\Catalog\Model\Layer\Filter\Item"
+                type="Venbhas\FilterMultiselect\Model\Layer\Filter\Item"/>
+
+    <preference for="Magento\CatalogSearch\Model\Layer\Filter\Attribute"
+                type="Venbhas\FilterMultiselect\Model\Layer\Filter\Attribute"/>
+
+    <!-- Swatches module replaces layered nav with single-select swatch HTML; use standard renderer when multi-select is on -->
+    <preference for="Magento\Swatches\Model\Plugin\FilterRenderer"
+                type="Venbhas\FilterMultiselect\Plugin\Swatches\SwatchLayeredFilterRenderer"/>
+
+    <!-- Inject dependencies into Item class for URL generation -->
+    <type name="Venbhas\FilterMultiselect\Model\Layer\Filter\Item">
+        <arguments>
+            <argument name="url" xsi:type="object">Magento\Framework\UrlInterface</argument>
+            <argument name="htmlPagerBlock" xsi:type="object">Magento\Theme\Block\Html\Pager</argument>
+            <argument name="request" xsi:type="object">Magento\Framework\App\Request\Http</argument>
+            <argument name="config" xsi:type="object">Venbhas\FilterMultiselect\Model\Config</argument>
+        </arguments>
+    </type>
+
+    <!-- Fix remove URL for active filter chips (trash icon) when State uses any Item implementation -->
+    <type name="Magento\Catalog\Model\Layer\Filter\Item">
+        <plugin name="venbhas_filtermultiselect_item_remove_url"
+                type="Venbhas\FilterMultiselect\Plugin\Layer\Filter\ItemPlugin"
+                sortOrder="10"/>
+    </type>
+
+    <!-- Inject dependencies into Attribute class for multi-select filter logic -->
+    <type name="Venbhas\FilterMultiselect\Model\Layer\Filter\Attribute">
+        <arguments>
+            <argument name="filterItemFactory" xsi:type="object">Magento\Catalog\Model\Layer\Filter\ItemFactory</argument>
+            <argument name="storeManager" xsi:type="object">Magento\Store\Model\StoreManagerInterface</argument>
+            <argument name="layer" xsi:type="object">Magento\Catalog\Model\Layer</argument>
+            <argument name="itemDataBuilder" xsi:type="object">Magento\Catalog\Model\Layer\Filter\Item\DataBuilder</argument>
+            <argument name="tagFilter" xsi:type="object">Magento\Framework\Filter\StripTags</argument>
+            <argument name="fulltextCollectionFactory" xsi:type="object">Magento\CatalogSearch\Model\ResourceModel\Fulltext\CollectionFactory</argument>
+            <argument name="searchCollectionFactory" xsi:type="object">Magento\CatalogSearch\Model\ResourceModel\Fulltext\SearchCollectionFactory</argument>
+            <argument name="categoryCollectionFilter" xsi:type="object">Magento\Catalog\Model\Layer\Category\CollectionFilter</argument>
+            <argument name="searchCollectionFilter" xsi:type="object">Magento\Catalog\Model\Layer\Search\CollectionFilter</argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Framework\App\Request\Http">
+        <plugin name="venbhas_filtermultiselect_attribute_checkbox_post"
+                type="Venbhas\FilterMultiselect\Plugin\Request\HttpGetPostValuePlugin"
+                sortOrder="10"/>
+    </type>
+
+    <type name="Magento\Swatches\Helper\Data">
+        <plugin name="venbhas_filtermultiselect_normalize_swatch_attribute_arrays"
+                type="Venbhas\FilterMultiselect\Plugin\Swatches\Helper\SwatchRequestAttributesPlugin"
+                sortOrder="5"/>
+    </type>
+
+</config>

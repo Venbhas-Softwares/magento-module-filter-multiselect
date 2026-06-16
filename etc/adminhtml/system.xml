@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="venbhas" translate="label" sortOrder="300">
+            <label>Venbhas</label>
+        </tab>
+        <section id="venbhas_filtermultiselect"
+                 translate="label"
+                 type="text"
+                 sortOrder="100"
+                 showInDefault="1"
+                 showInWebsite="1"
+                 showInStore="1">
+            <label>Filter Multiselect</label>
+            <tab>venbhas</tab>
+            <resource>Venbhas_FilterMultiselect::config</resource>
+            <group id="general"
+                   translate="label"
+                   type="text"
+                   sortOrder="10"
+                   showInDefault="1"
+                   showInWebsite="1"
+                   showInStore="1">
+                <label>General Settings</label>
+                <field id="enabled"
+                       translate="label comment"
+                       type="select"
+                       sortOrder="10"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1">
+                    <label>Enable Extension</label>
+                    <comment>Turns the Venbhas Filter Multiselect module on or off. When No, layered navigation behaves like standard Magento for this module.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="multiselect_globally"
+                       translate="label comment"
+                       type="select"
+                       sortOrder="20"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1">
+                    <label>Allow Multi-Select in Layered Navigation (Global)</label>
+                    <comment>When Yes, attributes may show multi-select checkboxes on the storefront only if the extension is enabled and each attribute has "Allow Multi-Select in Layered Navigation" set to Yes. When No here, all attributes use single-select links regardless of per-attribute settings. Price filters always use single-select links.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>
