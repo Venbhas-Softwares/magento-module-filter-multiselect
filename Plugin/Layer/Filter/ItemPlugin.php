@@ -13,27 +13,38 @@ namespace Venbhas\FilterMultiselect\Plugin\Layer\Filter;
 use Magento\Catalog\Model\Layer\Filter\Item as FilterItem;
 use Magento\Framework\App\Request\Http as HttpRequest;
 use Magento\Framework\UrlInterface;
+use Venbhas\FilterMultiselect\Model\Config\ModuleEnabledGuard;
+use Venbhas\FilterMultiselect\Plugin\AbstractPlugin;
 
-class ItemPlugin
+class ItemPlugin extends AbstractPlugin
 {
     private const SKIP_PARAMS = ['___from_store', '___store', 'q', 'p', 'limit', 'dir', 'order'];
 
     /** @var HttpRequest */
     private $request;
+
     /** @var UrlInterface */
     private $url;
 
+    /**
+     * @param ModuleEnabledGuard $moduleEnabledGuard Module enabled guard
+     * @param HttpRequest $request Current HTTP request (query parameters)
+     * @param UrlInterface $url Front-controller URL builder
+     */
     public function __construct(
+        ModuleEnabledGuard $moduleEnabledGuard,
         HttpRequest $request,
         UrlInterface $url
     ) {
+        parent::__construct($moduleEnabledGuard);
         $this->request = $request;
         $this->url = $url;
     }
 
     /**
-     * Replace remove URL with one that omits this filter's param (fixes trash icon in both themes).
-     * Always applied so the remove link works regardless of module config or Item implementation.
+     * Replace remove URL for core Item only (clear whole filter param).
+     * Venbhas Item::getRemoveUrl() already builds correct URLs: full clear for multi-value state
+     * chips, or partial clear when unchecking one checkbox — do not overwrite that result.
      *
      * @param FilterItem $subject
      * @param string $result Original getRemoveUrl() result
@@ -41,6 +52,14 @@ class ItemPlugin
      */
     public function afterGetRemoveUrl(FilterItem $subject, string $result): string
     {
+        if (!$this->isModuleEnabled()) {
+            return $result;
+        }
+
+        if ($subject instanceof \Venbhas\FilterMultiselect\Model\Layer\Filter\Item) {
+            return $result;
+        }
+
         try {
             $filter = $subject->getFilter();
             $filterCode = $filter->getRequestVar();

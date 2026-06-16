@@ -1,11 +1,13 @@
 <?php
 /**
- * Loaded from before.body.end so it always renders (Hyvä x-if does not run inline scripts in filter.phtml).
- * Uses a static asset so Luma works: child blocks under catalog.leftnav are never output — view.phtml only
- * calls getChildHtml('state') and the renderer, so filter-init-luma.phtml never appeared in the DOM.
+ * Luma storefront script loader for checkbox navigation and accordion expansion.
  *
  * @var \Magento\Framework\View\Element\Template $block
  */
 ?>
-<script src="<?= $block->escapeUrl($block->getViewFileUrl('Venbhas_FilterMultiselect::js/venbhas-filter-multiselect.js')) ?>"
-        defer></script>
+<script
+    src="<?= $escaper->escapeUrl(
+        $block->getViewFileUrl('Venbhas_FilterMultiselect::js/venbhas-filter-multiselect.js')
+    ) ?>"
+    defer
+></script>

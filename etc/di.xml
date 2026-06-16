@@ -9,6 +9,10 @@
     <preference for="Magento\CatalogSearch\Model\Layer\Filter\Attribute"
                 type="Venbhas\FilterMultiselect\Model\Layer\Filter\Attribute"/>
 
+    <!-- Swatches module replaces layered nav with single-select swatch HTML; use standard renderer when multi-select is on -->
+    <preference for="Magento\Swatches\Model\Plugin\FilterRenderer"
+                type="Venbhas\FilterMultiselect\Plugin\Swatches\SwatchLayeredFilterRenderer"/>
+
     <!-- Inject dependencies into Item class for URL generation -->
     <type name="Venbhas\FilterMultiselect\Model\Layer\Filter\Item">
         <arguments>
@@ -34,7 +38,23 @@
             <argument name="layer" xsi:type="object">Magento\Catalog\Model\Layer</argument>
             <argument name="itemDataBuilder" xsi:type="object">Magento\Catalog\Model\Layer\Filter\Item\DataBuilder</argument>
             <argument name="tagFilter" xsi:type="object">Magento\Framework\Filter\StripTags</argument>
+            <argument name="fulltextCollectionFactory" xsi:type="object">Magento\CatalogSearch\Model\ResourceModel\Fulltext\CollectionFactory</argument>
+            <argument name="searchCollectionFactory" xsi:type="object">Magento\CatalogSearch\Model\ResourceModel\Fulltext\SearchCollectionFactory</argument>
+            <argument name="categoryCollectionFilter" xsi:type="object">Magento\Catalog\Model\Layer\Category\CollectionFilter</argument>
+            <argument name="searchCollectionFilter" xsi:type="object">Magento\Catalog\Model\Layer\Search\CollectionFilter</argument>
         </arguments>
+    </type>
+
+    <type name="Magento\Framework\App\Request\Http">
+        <plugin name="venbhas_filtermultiselect_attribute_checkbox_post"
+                type="Venbhas\FilterMultiselect\Plugin\Request\HttpGetPostValuePlugin"
+                sortOrder="10"/>
+    </type>
+
+    <type name="Magento\Swatches\Helper\Data">
+        <plugin name="venbhas_filtermultiselect_normalize_swatch_attribute_arrays"
+                type="Venbhas\FilterMultiselect\Plugin\Swatches\Helper\SwatchRequestAttributesPlugin"
+                sortOrder="5"/>
     </type>
 
 </config>

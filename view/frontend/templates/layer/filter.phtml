@@ -1,10 +1,6 @@
 <?php
 /**
- * Venbhas FilterMultiselect - Filter item template
- *
- * Renders attribute filter items as checkboxes (multi-select) or links (single-select).
- * Price filters always render as single-select links regardless of admin configuration.
- * Compatible with Hyva theme: uses vanilla JS (no RequireJS/jQuery) and Tailwind-style classes.
+ * Luma layered navigation filter template with optional multi-select checkboxes.
  *
  * @var \Magento\LayeredNavigation\Block\Navigation\FilterRenderer $block
  * @var \Magento\Catalog\Model\Layer\Filter\Item[] $filterItems
@@ -14,75 +10,77 @@
 
 /** @var \Venbhas\FilterMultiselect\ViewModel\FilterConfig $filterConfig */
 $filterConfig = $block->getData('venbhas_filter_config');
-$isMultiSelectEnabled = $filterConfig ? $filterConfig->isEnabled() : true;
 $showProductCount = $filterConfig ? $filterConfig->shouldDisplayProductCount() : false;
 
-// FilterRenderer::render() assigns filterItems but never calls setFilter(),
-// so $block->getFilter() returns null. Obtain the filter from the first item instead.
 $filter = $block->getFilter() ?? (!empty($filterItems) ? $filterItems[0]->getFilter() : null);
 $isPriceFilter = $filter && ($filter->getRequestVar() === 'price');
 
-// Price filters are always single-select links; attribute filters follow admin config.
-$useCheckboxes = !$isPriceFilter && $isMultiSelectEnabled;
+$useCheckboxes = !$isPriceFilter
+    && $filterConfig
+    && $filterConfig->isMultiselectForFilter($filter);
+
+$hasActiveSelection = false;
+foreach ($filterItems as $filterItem) {
+    /** @var \Venbhas\FilterMultiselect\Model\Layer\Filter\Item $filterItem */
+    if ($useCheckboxes) {
+        if ($filterItem->isSelected()) {
+            $hasActiveSelection = true;
+            break;
+        }
+    } elseif ((int) $filterItem->getCount() > 0 && $filterItem->isSingleSelectSelected()) {
+        $hasActiveSelection = true;
+        break;
+    }
+}
 ?>
-<ol role="list" class="items venbhas-filter-multiselect" aria-label="<?= $escaper->escapeHtmlAttr(__('%1 filter options', $block->getFilterTitle())) ?>">
+<ol role="list"
+    class="items venbhas-filter-multiselect"
+    data-venbhas-request-var="<?= $escaper->escapeHtmlAttr($filter ? $filter->getRequestVar() : '') ?>"
+    data-venbhas-has-active="<?= $hasActiveSelection ? '1' : '0' ?>"
+    aria-label="<?= $escaper->escapeHtmlAttr(__('%1 filter options', $block->getFilterTitle())) ?>">
     <?php foreach ($filterItems as $filterItem): ?>
         <?php
         /** @var \Venbhas\FilterMultiselect\Model\Layer\Filter\Item $filterItem */
         if ($useCheckboxes) {
             $isSelected = $filterItem->isSelected();
-            $filterUrl  = $isSelected ? $filterItem->getRemoveUrl() : $filterItem->getUrl();
+            $filterUrl = $isSelected ? $filterItem->getRemoveUrl() : $filterItem->getUrl();
         } else {
             $isSelected = $filterItem->isSingleSelectSelected();
-            $filterUrl  = $isSelected
+            $filterUrl = $isSelected
                 ? $filterItem->getSingleSelectRemoveUrl()
                 : $filterItem->getSingleSelectUrl();
         }
+        $filterItemDomId = 'filter-item-' . (string) $filterItem->getValue();
         ?>
         <li class="item<?= $isSelected ? ' active' : '' ?>">
             <?php if ($useCheckboxes): ?>
-                <?php $itemId = 'filter-item-' . $escaper->escapeHtmlAttr($filterItem->getValue()); ?>
-                <label for="<?= $itemId ?>" class="flex justify-between py-1 cursor-pointer hover:text-black">
-                    <span class="flex items-center gap-2">
-                        <input type="checkbox"
-                               class="filter-checkbox"
-                               id="<?= $itemId ?>"
-                               <?= $isSelected ? 'checked="checked"' : '' ?>
-                               data-url="<?= $escaper->escapeHtmlAttr($filterUrl) ?>"
-                        />
-                        <span><?= /* @noEscape */ $filterItem->getLabel() ?></span>
-                    </span>
+                <input type="checkbox"
+                       class="filter-checkbox"
+                       id="<?= $escaper->escapeHtmlAttr($filterItemDomId) ?>"
+                       <?= $isSelected ? 'checked="checked"' : '' ?>
+                       data-url="<?= $escaper->escapeHtmlAttr($filterUrl) ?>"
+                />
+                <label for="<?= $escaper->escapeHtmlAttr($filterItemDomId) ?>">
+                    <span><?= /* @noEscape */ $filterItem->getLabel() ?></span>
                     <?php if ($showProductCount): ?>
-                        <span class="count">(<?= (int)$filterItem->getCount() ?>)</span>
+                        <span class="count"><?= (int) $filterItem->getCount() ?></span>
                     <?php endif; ?>
                 </label>
+            <?php elseif ($filterItem->getCount() > 0): ?>
+                <a href="<?= $escaper->escapeUrl($filterUrl) ?>"
+                   rel="nofollow"
+                   class="<?= $isSelected ? 'selected' : '' ?>">
+                    <?= /* @noEscape */ $filterItem->getLabel() ?>
+                    <?php if ($showProductCount): ?>
+                        <span class="count"><?= (int) $filterItem->getCount() ?></span>
+                    <?php endif; ?>
+                </a>
             <?php else: ?>
-                <?php if ($filterItem->getCount() > 0): ?>
-                    <a href="<?= $escaper->escapeUrl($filterUrl) ?>"
-                       class="flex justify-between py-1 hover:text-black<?= $isSelected ? ' font-semibold' : '' ?>"
-                        <?php if ((int) $filterItem->getCount() === 1): ?>
-                        aria-label="<?= $escaper->escapeHtmlAttr(__('%1 filter, 1 available product', strip_tags((string)$filterItem->getLabel()))) ?>"
-                        <?php else: ?>
-                        aria-label="<?= $escaper->escapeHtmlAttr(__('%1 filter, %2 available products', strip_tags((string)$filterItem->getLabel()), $filterItem->getCount())) ?>"
-                        <?php endif; ?>
-                    >
-                        <span><?= /* @noEscape */ $filterItem->getLabel() ?></span>
-                        <?php if ($showProductCount): ?>
-                            <span class="count">(<?= (int)$filterItem->getCount() ?>)</span>
-                        <?php endif; ?>
-                    </a>
-                <?php else: ?>
-                    <span class="flex justify-between py-1 hover:text-black">
-                        <span><?= /* @noEscape */ $filterItem->getLabel() ?></span>
-                        <?php if ($showProductCount): ?>
-                            <span class="count">(<?= (int)$filterItem->getCount() ?>)</span>
-                        <?php endif; ?>
-                    </span>
+                <?= /* @noEscape */ $filterItem->getLabel() ?>
+                <?php if ($showProductCount): ?>
+                    <span class="count"><?= (int) $filterItem->getCount() ?></span>
                 <?php endif; ?>
             <?php endif; ?>
         </li>
     <?php endforeach; ?>
 </ol>
-<?php
-// JS: layer/filter-js.phtml → static venbhas-filter-multiselect.js (before.body.end).
-?>

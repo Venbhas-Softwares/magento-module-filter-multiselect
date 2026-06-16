@@ -30,9 +30,23 @@
                        showInDefault="1"
                        showInWebsite="1"
                        showInStore="1">
-                    <label>Enable Multi-Select Attribute Filters</label>
-                    <comment>When enabled, attribute filters (e.g. size, color) display as checkboxes so shoppers can select multiple values at once. Price filters always use single-select links regardless of this setting.</comment>
+                    <label>Enable Extension</label>
+                    <comment>Turns the Venbhas Filter Multiselect module on or off. When No, layered navigation behaves like standard Magento for this module.</comment>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="multiselect_globally"
+                       translate="label comment"
+                       type="select"
+                       sortOrder="20"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1">
+                    <label>Allow Multi-Select in Layered Navigation (Global)</label>
+                    <comment>When Yes, attributes may show multi-select checkboxes on the storefront only if the extension is enabled and each attribute has "Allow Multi-Select in Layered Navigation" set to Yes. When No here, all attributes use single-select links regardless of per-attribute settings. Price filters always use single-select links.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
                 </field>
             </group>
         </section>

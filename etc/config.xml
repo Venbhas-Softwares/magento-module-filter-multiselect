@@ -4,8 +4,8 @@
     <default>
         <venbhas_filtermultiselect>
             <general>
-                <!-- Multi-select attribute filters enabled by default -->
                 <enabled>1</enabled>
+                <multiselect_globally>1</multiselect_globally>
             </general>
         </venbhas_filtermultiselect>
     </default>

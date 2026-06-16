@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Venbhas\FilterMultiselect\ViewModel;
 
+use Magento\Catalog\Model\Layer\Filter\FilterInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\View\Element\Block\ArgumentInterface;
 use Magento\Store\Model\ScopeInterface;
@@ -25,16 +26,28 @@ class FilterConfig implements ArgumentInterface
     public function __construct(
         private readonly Config $config,
         private readonly ScopeConfigInterface $scopeConfig
-    ) {}
+    ) {
+    }
 
     /**
-     * Whether multi-select checkbox mode is enabled for attribute filters.
+     * Multi-select checkboxes for this layered navigation filter (attribute must opt in).
+     *
+     * @param FilterInterface|null $filter Layer filter for the current block render.
      *
      * @return bool
      */
-    public function isEnabled(): bool
+    public function isMultiselectForFilter(?FilterInterface $filter): bool
     {
-        return $this->config->isEnabled();
+        if ($filter === null) {
+            return false;
+        }
+        try {
+            $attribute = $filter->getAttributeModel();
+        } catch (\Throwable $e) {
+            return false;
+        }
+
+        return $this->config->isLayeredMultiselectEnabledForAttribute($attribute);
     }
 
     /**

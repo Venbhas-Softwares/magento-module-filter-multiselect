@@ -2,10 +2,6 @@
 
 > Multi-select checkbox filtering for layered navigation attribute filters.
 
-[![Magento 2.4.8+](https://img.shields.io/badge/Magento-2.4.8%2B-orange?logo=magento)](https://devdocs.magento.com/)
-[![PHP 8.2+](https://img.shields.io/badge/PHP-8.2%20%7C%208.3%20%7C%208.4-blue?logo=php)](https://www.php.net/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Packagist](https://img.shields.io/packagist/v/venbhas/module-filter-multiselect)](https://packagist.org/packages/venbhas/module-filter-multiselect)
 
 ---
 
@@ -26,7 +22,7 @@ Price filters are intentionally left as single-select links, preserving the stan
 - Toggle on/off via **Magento Admin** without touching code
 - Configurable per **Default / Website / Store** scope
 - Compatible with **OpenSearch** and **Elasticsearch** backends
-- Storefront script is a small static file (`venbhas-filter-multiselect.js`) loaded from layout (Hyvä + Luma)
+- Luma accordion expansion is included; optional Hyvä package adds Alpine.js panel expansion
 
 ---
 
@@ -47,6 +43,7 @@ Price filters are intentionally left as single-select links, preserving the stan
 
 ### Via Composer (recommended)
 
+**Luma / Blank theme:**
 ```bash
 composer require venbhas/module-filter-multiselect
 bin/magento module:enable Venbhas_FilterMultiselect
@@ -54,14 +51,26 @@ bin/magento setup:upgrade
 bin/magento cache:clean
 ```
 
+**Hyvä theme** (requires the base module plus the Hyvä integration package):
+```bash
+composer require venbhas/module-filter-multiselect venbhas/module-filter-multiselect-hyva
+bin/magento module:enable Venbhas_FilterMultiselect Venbhas_FilterMultiselectHyva
+bin/magento setup:upgrade
+bin/magento cache:clean
+```
+
+> On Hyvä stores, enable `Venbhas_FilterMultiselectHyva` so Hyvä templates override the Luma storefront files.
+
 ### Manual Installation
 
-1. Download or clone this repository.
-2. Copy the contents into `app/code/Venbhas/FilterMultiselect/`.
+1. Copy `Venbhas/FilterMultiselect/` into `app/code/`.
+2. For Hyvä, also copy `Venbhas/FilterMultiselectHyva/` into `app/code/`.
 3. Run the following commands from your Magento root:
 
 ```bash
 bin/magento module:enable Venbhas_FilterMultiselect
+# Hyvä only:
+# bin/magento module:enable Venbhas_FilterMultiselectHyva
 bin/magento setup:upgrade
 bin/magento cache:clean
 ```
@@ -74,7 +83,8 @@ Navigate to **Admin → Stores → Configuration → Venbhas → Filter Multisel
 
 | Setting | Description | Default |
 |---------|-------------|---------|
-| Enable Multi-Select Attribute Filters | Toggles checkbox rendering for attribute filters. When disabled, reverts to standard Magento single-select links. | Yes |
+| Enable Extension | Master switch for the module. When disabled, layered navigation behaves like core Magento. | Yes |
+| Enable Multi-Select Attribute Filters | Global permission for checkbox rendering. Each attribute must also opt in via **Use in Layered Navigation Multi-Select**. | Yes |
 
 The setting is configurable at Default, Website, and Store View scope.
 
@@ -106,33 +116,21 @@ Price filters always render as standard links regardless of the module setting. 
 
 ## Module Structure
 
+The extension is split into two packages:
+
+| Package | Module | Purpose |
+|---------|--------|---------|
+| `venbhas/module-filter-multiselect` | `Venbhas_FilterMultiselect` | Core logic, Luma/Blank templates, accordion JS |
+| `venbhas/module-filter-multiselect-hyva` | `Venbhas_FilterMultiselectHyva` | Hyvä templates (Tailwind), Alpine.js panel expansion |
+
 ```
-Venbhas/FilterMultiselect/
-├── Model/
-│   ├── Config.php                          # Reads admin configuration
-│   └── Layer/Filter/
-│       ├── Attribute.php                   # Core multi-select filter logic
-│       └── Item.php                        # URL generation (add/remove values)
-├── ViewModel/
-│   └── FilterConfig.php                    # Provides config to templates
+Venbhas/FilterMultiselect/          # Required (includes Luma storefront)
+├── Model/, Plugin/, Observer/, Setup/, ViewModel/
 ├── etc/
-│   ├── module.xml                          # Module declaration
-│   ├── di.xml                              # Dependency injection config
-│   ├── config.xml                          # Default configuration values
-│   ├── acl.xml                             # Admin ACL resource
-│   └── adminhtml/system.xml               # Admin configuration UI
-├── view/frontend/
-│   ├── layout/
-│   │   ├── default.xml                     # Loads filter-js.phtml globally
-│   │   ├── catalog_category_view_type_layered.xml
-│   │   └── catalogsearch_result_index.xml
-│   ├── templates/layer/
-│   │   ├── filter.phtml                    # Filter rendering template
-│   │   └── filter-js.phtml                 # References storefront JS asset
-│   └── web/js/venbhas-filter-multiselect.js  # Checkbox → URL navigation
-├── composer.json
-├── registration.php
-└── LICENSE
+└── view/frontend/
+
+Venbhas/FilterMultiselectHyva/     # Hyvä storefront (optional)
+└── view/frontend/
 ```
 
 ---
